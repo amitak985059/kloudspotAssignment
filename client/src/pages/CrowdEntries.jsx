@@ -3,8 +3,12 @@ import Layout from '../components/Layout';
 import EntriesTable from '../components/entries/EntriesTable';
 import { analyticsAPI } from '../services/api';
 import { PAGINATION } from '../utils/constants';
+import { useSites } from "../context/SitesContext";
+
 
 const CrowdEntries = () => {
+  const { selectedSite, loading: sitesLoading } = useSites();
+
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({
@@ -15,37 +19,47 @@ const CrowdEntries = () => {
   });
 
   const fetchEntries = async (page = 1) => {
+    if (!selectedSite?.siteId) return;
+
     try {
       setLoading(true);
 
-      const params = {
-        page,
-        limit: pagination.limit,
+      const now = Math.floor(Date.now() / 1000);
+      const last24Hours = now - 24 * 60 * 60;
+
+      const payload = {
+        siteId: selectedSite.siteId,
+        fromUtc: last24Hours,
+        toUtc: now,
+        pageSize: pagination.limit,
+        pageNumber: page,
       };
 
-      const response = await analyticsAPI.getEntryExit(params);
+      const data = await analyticsAPI.getEntryExit(payload);
+      setEntries(data.records || []);
 
-      // Adjust based on actual API response structure
-      const data = response.data || response;
-      
-      setEntries(data.entries || data.records || data.data || []);
       setPagination({
-        currentPage: data.currentPage || data.page || page,
-        totalPages: data.totalPages || Math.ceil((data.total || 0) / pagination.limit),
-        totalRecords: data.total || data.totalRecords || 0,
+        currentPage: data.pageNumber || page,
+        totalPages: data.totalPages || 1,
+        totalRecords: data.totalRecords || 0,
         limit: pagination.limit,
       });
-
     } catch (error) {
-      console.error('Error fetching entries:', error);
+      console.error("❌ Entry/Exit API Error:", error);
     } finally {
       setLoading(false);
     }
   };
 
+
+
+
   useEffect(() => {
-    fetchEntries();
-  }, []);
+  if (!selectedSite) return;
+  fetchEntries(1);
+}, [selectedSite]);
+
+
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= pagination.totalPages) {
@@ -144,11 +158,10 @@ const CrowdEntries = () => {
                       <button
                         key={pageNum}
                         onClick={() => handlePageChange(pageNum)}
-                        className={`px-3 py-1 rounded-md text-sm ${
-                          pagination.currentPage === pageNum
+                        className={`px-3 py-1 rounded-md text-sm ${pagination.currentPage === pageNum
                             ? 'bg-primary-600 text-white'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
+                          }`}
                       >
                         {pageNum}
                       </button>

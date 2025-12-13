@@ -1,16 +1,15 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useState, useEffect, useRef } from "react";
-import { allSitesAPI } from "../services/api";
+import { useSites } from "../context/SitesContext";
+import { useState } from "react";
 
 const Layout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const [open, setopen] = useState(false)
-  const fetchedRef = useRef(false);
-  const [sites, setSites] = useState([]);
-  const [selectedSite, setSelectedSite] = useState(null);
+  const { sites, selectedSite, setSelectedSite, loading } = useSites();
+
+  const [open, setOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -21,95 +20,102 @@ const Layout = ({ children }) => {
     { path: "/", label: "Overview", icon: "/homeIcon.svg" },
     { path: "/entries", label: "Crowd Entries", icon: "/crowdIcon.svg" },
   ];
-  useEffect(() => {
-    if (fetchedRef.current) return;
-    fetchedRef.current = true;
-
-    allSitesAPI.getAllSites().then(res => {
-      setSites(res.data);
-      setSelectedSite(res.data[0]);
-      console.log("Fetched sites:", res.data);
-    });
-  }, []);
-
 
   return (
     <div className="flex min-h-screen">
-
-      <aside className={`bg-[#0D3C3F] text-white flex flex-col justify-between ${open ? "w-64" : "w-22"} transition-width duration-300`}>
+      {/* SIDEBAR */}
+      <aside
+        className={`bg-[#0D3C3F] text-white flex flex-col justify-between ${
+          open ? "w-64" : "w-22"
+        } transition-all duration-300`}
+      >
         <div>
-          <div className="flex w-full h-22 p-4 items-center justify-between ">
-
-            <div className={` ${open ? "" : "hidden"}`}>
-              <img src="/logoKloudspot.svg" className="" alt="logo" />
-
-            </div>
-            <div className="w-fit cursor-pointer" onClick={() => setopen(!open)}>
-              <img className="w-8" src="/menu-line-horizontal.svg" alt="" />
-            </div>
+          {/* LOGO + TOGGLE */}
+          <div className="flex w-full p-4 items-center justify-between">
+            {open && <img src="/logoKloudspot.svg" alt="logo" />}
+            <button onClick={() => setOpen(!open)}>
+              <img className="w-8" src="/menu-line-horizontal.svg" alt="menu" />
+            </button>
           </div>
 
+          {/* NAV */}
           <nav className="mt-6 space-y-1 px-4">
-            {navItems.map((item) => (
+            {navItems.map(item => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex rounded-lg font-medium transition 
-                          ${location.pathname === item.path
-                    ? "bg-white/20 text-white"
-                    : "text-gray-200 hover:bg-white/10"
+                className={`flex rounded-lg font-medium transition
+                  ${
+                    location.pathname === item.path
+                      ? "bg-white/20 text-white"
+                      : "text-gray-200 hover:bg-white/10"
                   }`}
               >
                 <div className="flex p-4 items-center gap-4 w-full">
-                  <div className="w-8 cursor-pointer"><img className="" src={item.icon} alt="" /></div>
+                  <img className="w-6" src={item.icon} alt="" />
                   {open && <span>{item.label}</span>}
                 </div>
-
               </Link>
             ))}
           </nav>
         </div>
 
-
-        <div className="flex w-full p-4 ">
-          <button className="flex w-full p-4 gap-4 hover:bg-white/10 rounded-lg" onClick={handleLogout}>
+        {/* LOGOUT */}
+        <div className="p-4">
+          <button
+            onClick={handleLogout}
+            className="flex w-full p-4 gap-4 hover:bg-white/10 rounded-lg"
+          >
             <img src="/logoutIcon.svg" alt="" />
             {open && <span>Logout</span>}
           </button>
         </div>
       </aside>
 
+      {/* MAIN */}
       <main className="flex-1 bg-gray-50">
-        <header className="w-full bg-white shadow-sm border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-4 text-gray-800">
-            <h1 className="text-xl font-semibold">Crowd Solutions</h1>
+        {/* HEADER */}
+        <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-xl font-semibold text-gray-800">
+              Crowd Solutions
+            </h1>
 
+            {/* SITE SELECT */}
             <select
-              value={selectedSite ? sites.indexOf(selectedSite) : ""}
+              disabled={loading}
+              value={selectedSite?.siteId || ""}
               onChange={(e) => {
-                const site = sites[e.target.value];
+                const site = sites.find(
+                  s => s.siteId === e.target.value
+                );
                 setSelectedSite(site);
-                console.log("Selected site:", site);
               }}
+              className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#0D3C3F]"
             >
-              {sites.map((site, index) => (
-                <option key={site._id} value={index}>
-                  {site.name}
-                </option>
-              ))}
+              {loading && <option>Loading sites...</option>}
+
+              {!loading &&
+                sites.map(site => (
+                  <option key={site.siteId} value={site.siteId}>
+                    {site.name}
+                  </option>
+                ))}
             </select>
-
-
           </div>
 
-
+          {/* ACTION ICONS */}
           <div className="flex items-center space-x-4">
-            <button className="p-2 bg-gray-100 rounded-full"><img src="/alertIcon.svg" alt="" /></button>
-            <button className="p-2 bg-gray-100 rounded-full"><img src="/Profile.svg" alt="" /></button>
+            <button className="p-2 bg-gray-100 rounded-full">
+              <img src="/alertIcon.svg" alt="alerts" />
+            </button>
+            <button className="p-2 bg-gray-100 rounded-full">
+              <img src="/Profile.svg" alt="profile" />
+            </button>
           </div>
         </header>
 
-
+        {/* PAGE CONTENT */}
         <div className="p-8">{children}</div>
       </main>
     </div>

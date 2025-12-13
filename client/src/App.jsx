@@ -4,10 +4,12 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import CrowdEntries from './pages/CrowdEntries';
+import { SitesProvider } from './context/SitesContext';
 
 function App() {
   return (
     <AuthProvider>
+    <SitesProvider>
       <Router>
         <Routes>
           {/* Public Route */}
@@ -26,7 +28,7 @@ function App() {
             path="/entries"
             element={
               <ProtectedRoute>
-                <CrowdEntries />
+                  <CrowdEntries />
               </ProtectedRoute>
             }
           />
@@ -35,6 +37,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
+    </SitesProvider>
     </AuthProvider>
   );
 }

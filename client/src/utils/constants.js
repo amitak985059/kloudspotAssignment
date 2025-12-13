@@ -11,6 +11,9 @@ export const API_ENDPOINTS = {
     DEMOGRAPHICS: '/analytics/demographics',
     ENTRY_EXIT: '/analytics/entry-exit',
   },
+  ALL:{
+    GETALL : '/sites'
+  }
 };
 
 export const SOCKET_URL = 'https://hiring-dev.internal.kloudspot.com'; // Update with actual socket URL

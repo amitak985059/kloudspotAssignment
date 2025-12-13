@@ -73,7 +73,7 @@ const Dashboard = () => {
 
     // Listen for alerts
     socketService.onAlert((data) => {
-      console.log('Alert received:', data);
+      // console.log('Alert received:', data);
       setAlert({
         message: `${data.action} detected in ${data.zone}`,
         severity: data.severity,
@@ -86,7 +86,7 @@ const Dashboard = () => {
 
     // Listen for live occupancy updates
     socketService.onLiveOccupancy((data) => {
-      console.log('Live occupancy update:', data);
+      // console.log('Live occupancy update:', data);
       setMetrics(prev => ({
         ...prev,
         occupancy: {
