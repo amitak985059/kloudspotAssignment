@@ -1,12 +1,17 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { allSitesAPI } from "../services/api";
 
 const Layout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
   const [open, setopen] = useState(false)
+  const fetchedRef = useRef(false);
+  const [sites, setSites] = useState([]);
+  const [selectedSite, setSelectedSite] = useState(null);
+
   const handleLogout = () => {
     logout();
     navigate("/login");
@@ -16,6 +21,17 @@ const Layout = ({ children }) => {
     { path: "/", label: "Overview", icon: "/homeIcon.svg" },
     { path: "/entries", label: "Crowd Entries", icon: "/crowdIcon.svg" },
   ];
+  useEffect(() => {
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
+
+    allSitesAPI.getAllSites().then(res => {
+      setSites(res.data);
+      setSelectedSite(res.data[0]);
+      console.log("Fetched sites:", res.data);
+    });
+  }, []);
+
 
   return (
     <div className="flex min-h-screen">
@@ -54,7 +70,7 @@ const Layout = ({ children }) => {
           </nav>
         </div>
 
-       
+
         <div className="flex w-full p-4 ">
           <button className="flex w-full p-4 gap-4 hover:bg-white/10 rounded-lg" onClick={handleLogout}>
             <img src="/logoutIcon.svg" alt="" />
@@ -68,9 +84,22 @@ const Layout = ({ children }) => {
           <div className="flex items-center space-x-4 text-gray-800">
             <h1 className="text-xl font-semibold">Crowd Solutions</h1>
 
-            <button className="px-4 py-2 border rounded-lg bg-gray-100 text-sm">
-              Avenue Mall
-            </button>
+            <select
+              value={selectedSite ? sites.indexOf(selectedSite) : ""}
+              onChange={(e) => {
+                const site = sites[e.target.value];
+                setSelectedSite(site);
+                console.log("Selected site:", site);
+              }}
+            >
+              {sites.map((site, index) => (
+                <option key={site._id} value={index}>
+                  {site.name}
+                </option>
+              ))}
+            </select>
+
+
           </div>
 
 
