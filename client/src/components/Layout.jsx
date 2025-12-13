@@ -20,7 +20,7 @@ const Layout = ({ children }) => {
   return (
     <div className="flex min-h-screen">
 
-      <aside className={`bg-[#0D3C3F] text-white flex flex-col justify-between ${open ? "w-64" : "w-16"} transition-width duration-300`}>
+      <aside className={`bg-[#0D3C3F] text-white flex flex-col justify-between ${open ? "w-64" : "w-22"} transition-width duration-300`}>
         <div>
           <div className="flex w-full h-22 p-4 items-center justify-between ">
 
@@ -46,7 +46,7 @@ const Layout = ({ children }) => {
               >
                 <div className="flex p-4 items-center gap-4 w-full">
                   <div className="w-8 cursor-pointer"><img className="" src={item.icon} alt="" /></div>
-                  <div className={` ${open ? "" : "hidden"}`}>{item.label}</div>
+                  {open && <span>{item.label}</span>}
                 </div>
 
               </Link>
@@ -54,13 +54,11 @@ const Layout = ({ children }) => {
           </nav>
         </div>
 
-        <div className="px-6 py-6">
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center space-x-2 px-4 py-3 hover:bg-white/10 text-white rounded-lg transition"
-          >
+       
+        <div className="flex w-full p-4 ">
+          <button className="flex w-full p-4 gap-4 hover:bg-white/10 rounded-lg" onClick={handleLogout}>
             <img src="/logoutIcon.svg" alt="" />
-            <span>Logout</span>
+            {open && <span>Logout</span>}
           </button>
         </div>
       </aside>
@@ -77,8 +75,8 @@ const Layout = ({ children }) => {
 
 
           <div className="flex items-center space-x-4">
-            <button className="p-2 bg-gray-100 rounded-full">🔔</button>
-            <button className="p-2 bg-gray-100 rounded-full">👤</button>
+            <button className="p-2 bg-gray-100 rounded-full"><img src="/alertIcon.svg" alt="" /></button>
+            <button className="p-2 bg-gray-100 rounded-full"><img src="/Profile.svg" alt="" /></button>
           </div>
         </header>
 
