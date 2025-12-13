@@ -63,9 +63,9 @@ const Login = () => {
       {/* RIGHT LOGIN CARD */}
       <div className="w-full max-w-md">
 
-        <div className="bg-[#1E3C3C] text-white rounded-t-xl px-6 py-6 flex items-center space-x-3">
-          <img src="/logoKloudspot.png" alt="logo" className="h-8" />
-          <h2 className="text-lg font-semibold"> <img src="/logoKloudspot" alt="" />kloudspot</h2>
+        <div className="bg-[#1E3C3C] text-white rounded-t-xl px-6 py-12 flex items-center space-x-3 justify-center ">
+          <img src="/logoKloudspot.svg" alt="logo" className="h-8" />
+
         </div>
 
         {/* LOGIN BOX */}
@@ -115,7 +115,7 @@ const Login = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
                 >
-                  {showPassword ? "🙈" : "👁️"}
+                  {showPassword ? <img src="/eyeOpen.svg" alt="" /> : <img className='w-[18px]' src="/eyeClose.png" alt="" />}
                 </button>
               </div>
             </div>
