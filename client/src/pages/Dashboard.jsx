@@ -105,8 +105,8 @@ const Dashboard = () => {
         timestamp: new Date(data.ts),
       });
 
-      // Auto-hide alert after 5 seconds
-      setTimeout(() => setAlert(null), 5000);
+      // Auto-hide alert after 20 seconds
+      setTimeout(() => setAlert(null), 20000);
     });
 
     // Listen for live occupancy updates

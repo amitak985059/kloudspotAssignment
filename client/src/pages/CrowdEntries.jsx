@@ -18,14 +18,14 @@ const CrowdEntries = () => {
     limit: PAGINATION.DEFAULT_LIMIT,
   });
 
-  const fetchEntries = async (page = 1) => {
+  const fetchEntries = async (page = 1) => { // this could change page = any number
     if (!selectedSite?.siteId) return;
 
     try {
       setLoading(true);
 
-      const now = Math.floor(Date.now() / 1000);
-      const last24Hours = now - 24 * 60 * 60;
+      const now = Math.floor(Date.now());
+      const last24Hours = now - 24 * 60 * 60 * 1000;
 
       const payload = {
         siteId: selectedSite.siteId,
@@ -85,19 +85,7 @@ const CrowdEntries = () => {
             </p>
           </div>
           <div className="flex items-center space-x-4">
-            <label className="text-sm text-gray-700">
-              Show:
-              <select
-                value={pagination.limit}
-                onChange={handleLimitChange}
-                className="ml-2 border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
-            </label>
+            
             <button
               onClick={() => fetchEntries(pagination.currentPage)}
               className="btn-secondary flex items-center space-x-2"

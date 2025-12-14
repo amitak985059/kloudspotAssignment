@@ -62,19 +62,19 @@ const EntriesTable = ({ data, loading }) => {
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+        <thead className="bg-[#E8E8E8]">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Visitor Name
+              Name
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Gender
+              Sex
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Entry Time
+              Entry
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Exit Time
+              Exit 
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Dwell Time
@@ -92,7 +92,7 @@ const EntriesTable = ({ data, loading }) => {
                     </span>
                   </div>
                   <div className="ml-4">
-                    <div className="text-sm font-medium text-gray-900">{entry.name || 'Unknown'}</div>
+                    <div className="text-sm font-medium text-gray-900">{entry.personName || 'Unknown'}</div>
                   </div>
                 </div>
               </td>
@@ -108,18 +108,29 @@ const EntriesTable = ({ data, loading }) => {
                 </span>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {formatTime(entry.entryTime || entry.entry_time)}
+                {formatTime(entry.entryLocal )}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {entry.exitTime || entry.exit_time ? (
-                  formatTime(entry.exitTime || entry.exit_time)
+                {entry.exitLocal  ? (
+                  formatTime(entry.exitLocal )
                 ) : (
-                  <span className="text-green-600 font-medium">Still Inside</span>
+                  <span className="text-black-600 font-medium">--</span>
                 )}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {formatDwellTime(entry.dwellTime || entry.dwell_time)}
+                  {
+                    entry.exitLocal  ? formatDwellTime(entry.dwellMinutes) : (
+                      <span className='text-black-600 font-medium'>--</span>  
+                    )
+                  }
               </td>
+              {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {
+                    entry.exitLocal  ? formatDwellTime(entry.dwellMinutes) : (
+                      <span className='text-black-600 font-medium'>--</span>  
+                    )
+                  }
+              </td> */}
             </tr>
           ))}
         </tbody>
