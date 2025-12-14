@@ -45,7 +45,7 @@ const CrowdEntries = () => {
         limit: pagination.limit,
       });
     } catch (error) {
-      console.error("❌ Entry/Exit API Error:", error);
+      console.error("Entry/Exit API Error:", error);
     } finally {
       setLoading(false);
     }

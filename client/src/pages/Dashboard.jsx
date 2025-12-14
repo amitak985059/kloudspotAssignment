@@ -5,8 +5,12 @@ import OccupancyChart from '../components/dashboard/OccupancyChart';
 import DemographicsChart from '../components/dashboard/DemographicsChart';
 import { analyticsAPI } from '../services/api';
 import socketService from '../services/socket';
+import { useSites } from "../context/SitesContext";
+
 
 const Dashboard = () => {
+  const { selectedSite } = useSites();
+
   const [metrics, setMetrics] = useState({
     occupancy: { value: 0, change: 0 },
     footfall: { value: 0, change: 0 },
@@ -19,53 +23,74 @@ const Dashboard = () => {
 
   // Fetch all dashboard data
   const fetchDashboardData = async () => {
+    if (!selectedSite?.siteId) return;
+
     try {
       setLoading(true);
 
-      // Get today's date range
-      const today = new Date();
-      const startOfDay = new Date(today.setHours(0, 0, 0, 0)).toISOString();
-      const endOfDay = new Date(today.setHours(23, 59, 59, 999)).toISOString();
+      const now = Math.floor(Date.now() / 1000);
+      const fromUtc = now - 24 * 60 * 60;
 
-      const params = {
-        startDate: startOfDay,
-        endDate: endOfDay,
+      const payload = {
+        siteId: selectedSite.siteId,
+        fromUtc,
+        toUtc: now,
       };
 
-      // Fetch all data in parallel
-      const [occupancyRes, footfallRes, dwellRes, demographicsRes] = await Promise.all([
-        analyticsAPI.getOccupancy(params),
-        analyticsAPI.getFootfall(params),
-        analyticsAPI.getDwellTime(params),
-        analyticsAPI.getDemographics(params),
+      const [
+        occupancyRes,
+        footfallRes,
+        dwellRes,
+        demographicsRes,
+      ] = await Promise.all([
+        analyticsAPI.getOccupancy(payload),
+        analyticsAPI.getFootfall(payload),
+        analyticsAPI.getDwellTime(payload),
+        analyticsAPI.getDemographics(payload),
       ]);
 
-      // Update metrics (adjust based on actual API response structure)
       setMetrics({
         occupancy: {
-          value: occupancyRes.data?.current || occupancyRes.current || 0,
-          change: occupancyRes.data?.change || occupancyRes.change || 0,
+          value: occupancyRes.data?.current ?? 0,
+          change: occupancyRes.data?.change ?? 0,
         },
         footfall: {
-          value: footfallRes.data?.total || footfallRes.total || 0,
-          change: footfallRes.data?.change || footfallRes.change || 0,
+          value: footfallRes.data?.total ?? 0,
+          change: footfallRes.data?.change ?? 0,
         },
         dwellTime: {
-          value: dwellRes.data?.average || dwellRes.average || 0,
-          change: dwellRes.data?.change || dwellRes.change || 0,
+          value: dwellRes.data?.average ?? 0,
+          change: dwellRes.data?.change ?? 0,
         },
       });
 
       // Update charts (adjust based on actual API response structure)
-      setOccupancyData(occupancyRes.data?.timeline || occupancyRes.timeline || []);
-      setDemographicsData(demographicsRes.data?.breakdown || demographicsRes.breakdown || []);
+      setOccupancyData(
+        (occupancyRes.data?.timeline || []).map(item => ({
+          time: item.ts
+            ? new Date(item.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            : item.time,
+          occupancy: item.count ?? item.occupancy ?? 0,
+        }))
+      );
+
+      const breakdown = demographicsRes.data?.breakdown || {};
+
+      setDemographicsData(
+        Object.entries(breakdown).map(([key, value]) => ({
+          gender: key,
+          count: value,
+        }))
+      );
+
 
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      console.error("❌ Dashboard API error:", error);
     } finally {
       setLoading(false);
     }
   };
+
 
   // Setup Socket.IO listeners
   useEffect(() => {
@@ -73,11 +98,11 @@ const Dashboard = () => {
 
     // Listen for alerts
     socketService.onAlert((data) => {
-      // console.log('Alert received:', data);
+      console.log('received from socket Alert received:', data);
       setAlert({
-        message: `${data.action} detected in ${data.zone}`,
+        message: `${data.personName} ${data.direction} at ${data.zoneName}`,
         severity: data.severity,
-        timestamp: new Date(),
+        timestamp: new Date(data.ts),
       });
 
       // Auto-hide alert after 5 seconds
@@ -86,15 +111,17 @@ const Dashboard = () => {
 
     // Listen for live occupancy updates
     socketService.onLiveOccupancy((data) => {
-      // console.log('Live occupancy update:', data);
+      if (data.siteId !== selectedSite?.siteId) return;
+
       setMetrics(prev => ({
         ...prev,
         occupancy: {
           ...prev.occupancy,
-          value: data.count || data.occupancy,
+          value: data.siteOccupancy,
         },
       }));
     });
+
 
     return () => {
       socketService.offAlert();
@@ -105,7 +132,7 @@ const Dashboard = () => {
   // Fetch data on mount
   useEffect(() => {
     fetchDashboardData();
-  }, []);
+  }, [selectedSite]);
 
   // Format dwell time (assuming it's in minutes)
   const formatDwellTime = (minutes) => {
@@ -134,11 +161,10 @@ const Dashboard = () => {
 
         {/* Alert Banner */}
         {alert && (
-          <div className={`p-4 rounded-lg border ${
-            alert.severity === 'high' 
-              ? 'bg-red-50 border-red-200 text-red-700' 
-              : 'bg-yellow-50 border-yellow-200 text-yellow-700'
-          }`}>
+          <div className={`p-4 rounded-lg border ${alert.severity === 'high'
+            ? 'bg-red-50 border-red-200 text-red-700'
+            : 'bg-yellow-50 border-yellow-200 text-yellow-700'
+            }`}>
             <div className="flex items-center">
               <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />

@@ -20,12 +20,12 @@ export const SitesProvider = ({ children }) => {
       setLoading(true);
       const res = await allSitesAPI.getAllSites();
       const sitesData = res.data || [];
-      console.log("✅ Sites fetched:", sitesData);
+      console.log("Sites fetched:", sitesData);
       setSites(sitesData);
       
       setSelectedSite(sitesData[0] || null);
     } catch (err) {
-      console.error("❌ Failed to fetch sites:", err);
+      console.error("Failed to fetch sites:", err);
       setError("Failed to load sites");
     } finally {
       setLoading(false);

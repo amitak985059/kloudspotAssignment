@@ -19,7 +19,7 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.error('❌ Request Error:', error);
+    console.error('Request Error:', error);
     return Promise.reject(error);
   }
 );
@@ -27,18 +27,18 @@ api.interceptors.request.use(
 // Response interceptor
 api.interceptors.response.use(
   (response) => {
-    console.log(`✅ API Response: ${response.config.url}`, response.data);
+    console.log(` API Response: ${response.config.url}`, response.data);
     return response;
   },
   (error) => {
-    console.error(`❌ API Error: ${error.config?.url}`, {
+    console.error(` API Error: ${error.config?.url}`, {
       status: error.response?.status,
       data: error.response?.data,
       message: error.message
     });
     
     if (error.response?.status === 401) {
-      console.error('❌ Unauthorized - Token may be expired');
+      console.error(' Unauthorized - Token may be expired');
       localStorage.removeItem('token');
       window.location.href = '/login';
     }
@@ -63,33 +63,33 @@ export const authAPI = {
 export const analyticsAPI = {
   getOccupancy: async (params) => {
     try {
-      console.log('🔵 Calling Occupancy API with:', params);
+      console.log('Calling Occupancy API with:', params);
       const response = await api.post(API_ENDPOINTS.ANALYTICS.OCCUPANCY, params);
       return response.data;
     } catch (error) {
-      console.error("❌ Occupancy API Error:", error);
+      console.error(" Occupancy API Error:", error);
       throw error;
     }
   },
 
   getFootfall: async (params) => {
     try {
-      console.log('🔵 Calling Footfall API with:', params);
+      console.log('Calling Footfall API with:', params);
       const response = await api.post(API_ENDPOINTS.ANALYTICS.FOOTFALL, params);
       return response.data;
     } catch (error) {
-      console.error("❌ Footfall API Error:", error);
+      console.error(" Footfall API Error:", error);
       throw error;
     }
   },
 
   getDwellTime: async (params) => {
     try {
-      console.log('🔵 Calling Dwell Time API with:', params);
+      console.log('Calling Dwell Time API with:', params);
       const response = await api.post(API_ENDPOINTS.ANALYTICS.DWELL, params);
       return response.data;
     } catch (error) {
-      console.error("❌ Dwell Time API Error:", error);
+      console.error(" Dwell Time API Error:", error);
       throw error;
     }
   },
@@ -100,18 +100,18 @@ export const analyticsAPI = {
       const response = await api.post(API_ENDPOINTS.ANALYTICS.DEMOGRAPHICS, params);
       return response.data;
     } catch (error) {
-      console.error("❌ Demographics API Error:", error);
+      console.error("Demographics API Error:", error);
       throw error;
     }
   },
 
   getEntryExit: async (params) => {
     try {
-      console.log('🔵 Calling Entry/Exit API with:', params);
+      console.log('Calling Entry/Exit API with:', params);
       const response = await api.post(API_ENDPOINTS.ANALYTICS.ENTRY_EXIT, params);
       return response.data;
     } catch (error) {
-      console.error("❌ Entry/Exit API Error:", error);
+      console.error("Entry/Exit API Error:", error);
       throw error;
     }
   },
