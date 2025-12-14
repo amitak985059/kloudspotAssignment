@@ -43,10 +43,21 @@ const EntriesTable = ({ data, loading }) => {
   }
 
   const formatTime = (timestamp) => {
-    if (!timestamp) return '-';
+    if (!timestamp) return '--';
     try {
-      return format(new Date(timestamp), 'MMM dd, yyyy HH:mm:ss');
-    } catch {
+      // Handle both ISO string and DD/MM/YYYY HH:mm:ss format
+      let date;
+      if (timestamp.includes('/')) {
+        // Parse DD/MM/YYYY HH:mm:ss format
+        const [datePart, timePart] = timestamp.split(' ');
+        const [day, month, year] = datePart.split('/');
+        date = new Date(`${year}-${month}-${day}T${timePart}`);
+      } else {
+        date = new Date(timestamp);
+      }
+      return format(date, 'hh:mm a');
+    } catch (error) {
+      console.error('Error formatting time:', error, timestamp);
       return timestamp;
     }
   };
