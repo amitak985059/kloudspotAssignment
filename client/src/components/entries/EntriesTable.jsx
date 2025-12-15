@@ -108,12 +108,12 @@ const EntriesTable = ({ data, loading }) => {
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                <span className={`px-2 inline-flex text-xs leading-5 font-semibold ${
                   entry.gender?.toLowerCase() === 'male' 
-                    ? 'bg-blue-100 text-blue-800'
+                    ? ''
                     : entry.gender?.toLowerCase() === 'female'
-                    ? 'bg-pink-100 text-pink-800'
-                    : 'bg-gray-100 text-gray-800'
+                    ? ''
+                    : ' '
                 }`}>
                   {entry.gender || 'N/A'}
                 </span>
