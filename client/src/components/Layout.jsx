@@ -1,9 +1,14 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useSites } from "../context/SitesContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import socketService from "../services/socket";
+import AlertsPanel from "../alerts/AlertsPanel";
 
 const Layout = ({ children }) => {
+  const [showAlerts, setShowAlerts] = useState(false);
+  const [alerts, setAlerts] = useState([]);
+
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
@@ -20,14 +25,33 @@ const Layout = ({ children }) => {
     { path: "/", label: "Overview", icon: "/homeIcon.svg" },
     { path: "/entries", label: "Crowd Entries", icon: "/crowdIcon.svg" },
   ];
+  useEffect(() => {
+    socketService.connect();
+
+    socketService.onAlert((data) => {
+      const newAlert = {
+        personName: data.personName,
+        direction: data.direction,
+        zoneName: data.zoneName,
+        severity: data.severity,
+        time: new Date(data.ts).toLocaleString(),
+      };
+
+      setAlerts(prev => [newAlert, ...prev]);
+    });
+
+    return () => {
+      socketService.offAlert();
+    };
+  }, []);
+
 
   return (
     <div className="flex min-h-screen">
       {/* SIDEBAR */}
       <aside
-        className={`bg-[#0D3C3F] text-white flex flex-col justify-between ${
-          open ? "w-64" : "w-22"
-        } transition-all duration-300`}
+        className={`bg-[#0D3C3F] text-white flex flex-col justify-between ${open ? "w-64" : "w-22"
+          } transition-all duration-300`}
       >
         <div>
           {/* LOGO + TOGGLE */}
@@ -45,10 +69,9 @@ const Layout = ({ children }) => {
                 key={item.path}
                 to={item.path}
                 className={`flex rounded-lg font-medium transition
-                  ${
-                    location.pathname === item.path
-                      ? "bg-white/20 text-white"
-                      : "text-gray-200 hover:bg-white/10"
+                  ${location.pathname === item.path
+                    ? "bg-white/20 text-white"
+                    : "text-gray-200 hover:bg-white/10"
                   }`}
               >
                 <div className="flex p-4 items-center gap-4 w-full">
@@ -106,7 +129,7 @@ const Layout = ({ children }) => {
 
           {/* ACTION ICONS */}
           <div className="flex items-center space-x-4">
-            <button className="p-2 bg-gray-100 rounded-full">
+            <button className="p-2 bg-gray-100 rounded-full" onClick={() => setShowAlerts(true)}>
               <img src="/alertIcon.svg" alt="alerts" />
             </button>
             <button className="p-2 bg-gray-100 rounded-full">
@@ -116,7 +139,13 @@ const Layout = ({ children }) => {
         </header>
 
         {/* PAGE CONTENT */}
-        <div className="p-8">{children}</div>
+        <div className="p-8">{children}</div>{showAlerts && (
+          <AlertsPanel
+            alerts={alerts}
+            onClose={() => setShowAlerts(false)}
+          />
+        )}
+
       </main>
     </div>
   );

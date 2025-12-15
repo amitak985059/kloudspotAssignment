@@ -4,7 +4,7 @@ import MetricCard from '../components/dashboard/MetricCard';
 import OccupancyChart from '../components/dashboard/OccupancyChart';
 import DemographicsChart from '../components/dashboard/DemographicsChart';
 import { analyticsAPI } from '../services/api';
-import socketService from '../services/socket';
+// import socketService from '../services/socket';
 import { useSites } from "../context/SitesContext";
 
 const Dashboard = () => {
@@ -18,7 +18,7 @@ const Dashboard = () => {
   const [occupancyData, setOccupancyData] = useState([]);
   const [demographicsData, setDemographicsData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [alert, setAlert] = useState(null);
+
 
   // Fetch all dashboard data
   const fetchDashboardData = async () => {
@@ -132,42 +132,42 @@ const Dashboard = () => {
   };
 
   // Setup Socket.IO listeners
-  useEffect(() => {
-    socketService.connect();
+  // useEffect(() => {
+  //   socketService.connect();
 
-    // Listen for alerts
-    socketService.onAlert((data) => {
-      console.log(' Alert received:', data);
-      setAlert({
-        message: `${data.personName} ${data.direction} at ${data.zoneName}`,
-        severity: data.severity,
-        timestamp: new Date(data.ts),
-      });
+  //   // // Listen for alerts
+  //   // socketService.onAlert((data) => {
+  //   //   console.log(' Alert received:', data);
+  //   //   setAlert({
+  //   //     message: `${data.personName} ${data.direction} at ${data.zoneName}`,
+  //   //     severity: data.severity,
+  //   //     timestamp: new Date(data.ts),
+  //   //   });
 
-      // Auto-hide alert after 20 seconds
-      setTimeout(() => setAlert(null), 20000);
-    });
+  //   //   // Auto-hide alert after 20 seconds
+  //   //   setTimeout(() => setAlert(null), 20000);
+  //   // });
 
-    // Listen for live occupancy updates
-    socketService.onLiveOccupancy((data) => {
-      console.log('Live occupancy update:', data);
+  //   // Listen for live occupancy updates
+  //   socketService.onLiveOccupancy((data) => {
+  //     console.log('Live occupancy update:', data);
       
-      if (data.siteId !== selectedSite?.siteId) return;
+  //     if (data.siteId !== selectedSite?.siteId) return;
 
-      setMetrics(prev => ({
-        ...prev,
-        occupancy: {
-          ...prev.occupancy,
-          value: data.siteOccupancy,
-        },
-      }));
-    });
+  //     setMetrics(prev => ({
+  //       ...prev,
+  //       occupancy: {
+  //         ...prev.occupancy,
+  //         value: data.siteOccupancy,
+  //       },
+  //     }));
+  //   });
 
-    return () => {
-      socketService.offAlert();
-      socketService.offLiveOccupancy();
-    };
-  }, [selectedSite]);
+  //   return () => {
+  //     socketService.offAlert();
+  //     // socketService.offLiveOccupancy();
+  //   };
+  // }, [selectedSite]);
 
   // Fetch data when site changes
   useEffect(() => {
@@ -204,7 +204,7 @@ const Dashboard = () => {
           </button>
         </div>
 
-        {/* Alert Banner */}
+        {/* Alert Banner
         {alert && (
           <div className={`p-4 rounded-lg border ${
             alert.severity === 'high'
@@ -230,7 +230,7 @@ const Dashboard = () => {
               </button>
             </div>
           </div>
-        )}
+        )} */}
 
         {/* Metric Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
