@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in on mount
+
     if (token) {
       setUser({ token });
       socketService.connect();
@@ -21,29 +21,17 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       const response = await authAPI.login(credentials);
-
-      // The API returns: { token: "JWT..." }
       const authToken = response.token;
-
       if (!authToken) {
         throw new Error("Token missing in API response");
       }
-
       localStorage.setItem("token", authToken);
       setToken(authToken);
-      
-
-      // Set user minimal info
       setUser({ email: credentials.email });
-
-      // Connect socket after login
       socketService.connect();
-      // console.log("Login successful, token stored.");
-
       return { success: true };
     } catch (error) {
       console.error("Login error:", error);
-
       return {
         success: false,
         message: error.response?.status === 401

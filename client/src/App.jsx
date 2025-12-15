@@ -12,10 +12,7 @@ function App() {
     <SitesProvider>
       <Router>
         <Routes>
-          {/* Public Route */}
           <Route path="/login" element={<Login />} />
-
-          {/* Protected Routes */}
           <Route
             path="/"
             element={
@@ -32,8 +29,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
-          {/* Catch all - redirect to dashboard */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>

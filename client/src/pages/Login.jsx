@@ -54,13 +54,11 @@ const Login = () => {
       className="min-h-screen w-full bg-cover bg-center flex items-center justify-between px-10"
       style={{ backgroundImage: "url('/homeImage.png')" }}
     >
-      {/* LEFT SIDE TEXT */}
       <div className="text-white font-semibold text-4xl leading-tight drop-shadow-lg">
         <h1>Welcome to the</h1>
         <h1>Crowd Management System</h1>
       </div>
 
-      {/* RIGHT LOGIN CARD */}
       <div className="w-full max-w-md">
 
         <div className="bg-[#1E3C3C] text-white rounded-t-xl px-6 py-12 flex items-center space-x-3 justify-center ">
@@ -68,7 +66,6 @@ const Login = () => {
 
         </div>
 
-        {/* LOGIN BOX */}
         <div className="bg-white p-8 rounded-b-xl shadow-xl">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
@@ -77,7 +74,6 @@ const Login = () => {
               </div>
             )}
 
-            {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Log In *
@@ -93,7 +89,6 @@ const Login = () => {
               />
             </div>
 
-            {/* Password */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Password *
@@ -120,7 +115,6 @@ const Login = () => {
               </div>
             </div>
 
-            {/* Login Button */}
             <button
               type="submit"
               disabled={loading}

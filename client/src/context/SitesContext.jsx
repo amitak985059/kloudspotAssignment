@@ -22,7 +22,7 @@ export const SitesProvider = ({ children }) => {
       const sitesData = res.data || [];
       console.log("Sites fetched:", sitesData);
       setSites(sitesData);
-      
+
       setSelectedSite(sitesData[0] || null);
     } catch (err) {
       console.error("Failed to fetch sites:", err);
@@ -33,9 +33,9 @@ export const SitesProvider = ({ children }) => {
   };
 
   useEffect(() => {
-        if (authLoading) return;               
-    if (!isAuthenticated) return;            
-    if (fetchedRef.current) return; 
+    if (authLoading) return;
+    if (!isAuthenticated) return;
+    if (fetchedRef.current) return;
     fetchedRef.current = true;
 
     fetchSites();

@@ -4,6 +4,8 @@ const COLORS = {
   male: '#3b82f6',
   female: '#ec4899',
   other: '#8b5cf6',
+  Male: '#3b82f6',
+  Female: '#ec4899',
 };
 
 const DemographicsChart = ({ data, loading }) => {
@@ -27,24 +29,34 @@ const DemographicsChart = ({ data, loading }) => {
     );
   }
 
-  // Format data for pie chart
-  const pieData = data.map(item => ({
-    name: item.gender || item.category,
-    value: item.count || item.value,
+  // Ensure we have valid data for the chart
+  const pieData = data.filter(item => item.value > 0).map(item => ({
+    name: item.name || item.gender,
+    value: item.value,
   }));
 
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
+      const total = pieData.reduce((sum, item) => sum + item.value, 0);
+      const percentage = ((payload[0].value / total) * 100).toFixed(1);
+      
       return (
         <div className="bg-white border border-gray-200 rounded-lg p-3 shadow-lg">
           <p className="font-semibold text-gray-900">{payload[0].name}</p>
           <p className="text-sm text-gray-600">
             Count: <span className="font-medium">{payload[0].value}</span>
           </p>
+          <p className="text-sm text-gray-600">
+            Percentage: <span className="font-medium">{percentage}%</span>
+          </p>
         </div>
       );
     }
     return null;
+  };
+
+  const renderLabel = ({ name, percent }) => {
+    return `${name}: ${(percent * 100).toFixed(1)}%`;
   };
 
   return (
@@ -57,7 +69,7 @@ const DemographicsChart = ({ data, loading }) => {
             cx="50%"
             cy="50%"
             labelLine={false}
-            label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+            label={renderLabel}
             outerRadius={100}
             fill="#8884d8"
             dataKey="value"
@@ -65,7 +77,7 @@ const DemographicsChart = ({ data, loading }) => {
             {pieData.map((entry, index) => (
               <Cell 
                 key={`cell-${index}`} 
-                fill={COLORS[entry.name.toLowerCase()] || COLORS.other}
+                fill={COLORS[entry.name] || COLORS.other}
               />
             ))}
           </Pie>
@@ -77,6 +89,24 @@ const DemographicsChart = ({ data, loading }) => {
           />
         </PieChart>
       </ResponsiveContainer>
+      
+
+      <div className="mt-4 pt-4 border-t border-gray-200">
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          {pieData.map((item, index) => (
+            <div key={index} className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div 
+                  className="w-3 h-3 rounded-full mr-2"
+                  style={{ backgroundColor: COLORS[item.name] || COLORS.other }}
+                ></div>
+                <span className="text-gray-600">{item.name}</span>
+              </div>
+              <span className="font-semibold text-gray-900">{item.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
