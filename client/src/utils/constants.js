@@ -16,7 +16,7 @@ export const API_ENDPOINTS = {
   }
 };
 
-export const SOCKET_URL = 'https://hiring-dev.internal.kloudspot.com'; // Update with actual socket URL
+export const SOCKET_URL = 'https://hiring-dev.internal.kloudspot.com'; 
 
 export const SOCKET_EVENTS = {
   ALERT: 'alert',

@@ -12,11 +12,18 @@ const MetricCard = ({ title, value, change, icon, loading }) => {
   }
 
   return (
-    <div className="card hover:shadow-lg transition-shadow">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium text-gray-600 mb-2">{title}</p>
-          <p className="text-3xl font-bold text-gray-900 mb-2">{value}</p>
+
+          <p className="text-sm font-medium text-gray-600 mb-3">{title}</p>
+          
+
+          <p className="text-4xl font-bold text-gray-900 mb-3">
+            {typeof value === 'number' ? value.toLocaleString() : value}
+          </p>
+          
+
           {change !== undefined && (
             <div className="flex items-center">
               <span
@@ -39,9 +46,13 @@ const MetricCard = ({ title, value, change, icon, loading }) => {
             </div>
           )}
         </div>
+        
+
         {icon && (
-          <div className="flex-shrink-0 p-3 bg-primary-100 rounded-lg">
-            <span className="text-3xl">{icon}</span>
+          <div className="flex-shrink-0 ml-4">
+            <div className="w-14 h-14 bg-blue-50 rounded-lg flex items-center justify-center">
+              <span className="text-3xl">{icon}</span>
+            </div>
           </div>
         )}
       </div>

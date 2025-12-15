@@ -3,12 +3,15 @@ import Layout from '../components/Layout';
 import MetricCard from '../components/dashboard/MetricCard';
 import OccupancyChart from '../components/dashboard/OccupancyChart';
 import DemographicsChart from '../components/dashboard/DemographicsChart';
+import DemographicsTimelineChart from '../components/dashboard/DemographicsTimelineChart';
 import { analyticsAPI } from '../services/api';
-// import socketService from '../services/socket';
 import { useSites } from "../context/SitesContext";
 
 const Dashboard = () => {
   const { selectedSite } = useSites();
+  
+  const [dateRange, setDateRange] = useState('today');
+  const [customDates, setCustomDates] = useState({ from: '', to: '' });
 
   const [metrics, setMetrics] = useState({
     occupancy: { value: 0, change: 0 },
@@ -17,8 +20,56 @@ const Dashboard = () => {
   });
   const [occupancyData, setOccupancyData] = useState([]);
   const [demographicsData, setDemographicsData] = useState([]);
+  const [demographicsTimelineData, setDemographicsTimelineData] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Get date range in milliseconds
+  const getDateRange = () => {
+    const now = Date.now();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    switch(dateRange) {
+      case 'today':
+        return {
+          fromUtc: today.getTime(),
+          toUtc: now
+        };
+      case 'yesterday':
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayEnd = new Date(yesterday);
+        yesterdayEnd.setHours(23, 59, 59, 999);
+        return {
+          fromUtc: yesterday.getTime(),
+          toUtc: yesterdayEnd.getTime()
+        };
+      case '7days':
+        const weekAgo = new Date(today);
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        return {
+          fromUtc: weekAgo.getTime(),
+          toUtc: now
+        };
+      case '30days':
+        const monthAgo = new Date(today);
+        monthAgo.setDate(monthAgo.getDate() - 30);
+        return {
+          fromUtc: monthAgo.getTime(),
+          toUtc: now
+        };
+      case 'custom':
+        if (customDates.from && customDates.to) {
+          return {
+            fromUtc: new Date(customDates.from).getTime(),
+            toUtc: new Date(customDates.to).getTime()
+          };
+        }
+        return { fromUtc: today.getTime(), toUtc: now };
+      default:
+        return { fromUtc: today.getTime(), toUtc: now };
+    }
+  };
 
   // Fetch all dashboard data
   const fetchDashboardData = async () => {
@@ -27,64 +78,51 @@ const Dashboard = () => {
     try {
       setLoading(true);
 
-      // CRITICAL: API expects milliseconds, not seconds
-      const now = Date.now(); // milliseconds
-      const fromUtc = now - (24 * 60 * 60 * 1000); // 24 hours ago in milliseconds
+      const { fromUtc, toUtc } = getDateRange();
 
       const payload = {
         siteId: selectedSite.siteId,
         fromUtc: fromUtc,
-        toUtc: now,
+        toUtc: toUtc,
       };
 
       console.log("📤 Dashboard API payload:", payload);
 
-      const [
-        occupancyRes,
-        footfallRes,
-        dwellRes,
-        demographicsRes,
-      ] = await Promise.all([
-        analyticsAPI.getOccupancy(payload).catch(err => {
-          console.error("Occupancy error:", err);
-          return null;
-        }),
-        analyticsAPI.getFootfall(payload).catch(err => {
-          console.error("Footfall error:", err);
-          return null;
-        }),
-        analyticsAPI.getDwellTime(payload).catch(err => {
-          console.error("Dwell error:", err);
-          return null;
-        }),
-        analyticsAPI.getDemographics(payload).catch(err => {
-          console.error("Demographics error:", err);
-          return null;
-        }),
-      ]);
-
-      console.log("API Responses:", {
-        occupancy: occupancyRes,
-        footfall: footfallRes,
-        dwell: dwellRes,
-        demographics: demographicsRes
-      });
+      const [occupancyRes, footfallRes, dwellRes, demographicsRes] = 
+        await Promise.all([
+          analyticsAPI.getOccupancy(payload).catch(err => {
+            console.error("Occupancy error:", err);
+            return null;
+          }),
+          analyticsAPI.getFootfall(payload).catch(err => {
+            console.error("Footfall error:", err);
+            return null;
+          }),
+          analyticsAPI.getDwellTime(payload).catch(err => {
+            console.error("Dwell error:", err);
+            return null;
+          }),
+          analyticsAPI.getDemographics(payload).catch(err => {
+            console.error("Demographics error:", err);
+            return null;
+          }),
+        ]);
 
       // Calculate current occupancy from latest bucket
       let currentOccupancy = 0;
-      if (occupancyRes && occupancyRes.buckets && occupancyRes.buckets.length > 0) {
+      if (occupancyRes?.buckets?.length > 0) {
         const latestBucket = occupancyRes.buckets[occupancyRes.buckets.length - 1];
         currentOccupancy = Math.round(latestBucket.avg);
       }
 
-      // Set metrics with correct field names from actual API responses
+      // Set metrics
       setMetrics({
         occupancy: {
           value: currentOccupancy,
-          change: 0, // API doesn't provide change percentage
+          change: 0,
         },
         footfall: {
-          value: footfallRes?.footfall ?? 0, 
+          value: footfallRes?.footfall ?? 0,
           change: 0,
         },
         dwellTime: {
@@ -93,20 +131,18 @@ const Dashboard = () => {
         },
       });
 
-      // Extract occupancy chart data from buckets
-      if (occupancyRes && occupancyRes.buckets) {
+
+      if (occupancyRes?.buckets) {
         const chartData = occupancyRes.buckets.map(bucket => ({
-          time: bucket.local.split(' ')[1], // Extract time part "04:00:00"
+          time: bucket.local.split(' ')[1].substring(0, 5),
           timestamp: bucket.utc,
           occupancy: Math.round(bucket.avg),
         }));
         setOccupancyData(chartData);
-        console.log("📊 Occupancy chart data:", chartData.length, "points");
       }
 
-      // Extract demographics chart data from buckets
-      // Calculate totals across all time buckets
-      if (demographicsRes && demographicsRes.buckets) {
+
+      if (demographicsRes?.buckets) {
         let totalMale = 0;
         let totalFemale = 0;
 
@@ -115,13 +151,12 @@ const Dashboard = () => {
           totalFemale += bucket.female || 0;
         });
 
-        const demographicsChartData = [
-          { name: 'Male', value: Math.round(totalMale), gender: 'male' },
-          { name: 'Female', value: Math.round(totalFemale), gender: 'female' },
-        ];
+        setDemographicsData([
+          { name: 'Male', value: Math.round(totalMale) },
+          { name: 'Female', value: Math.round(totalFemale) },
+        ]);
 
-        setDemographicsData(demographicsChartData);
-        console.log("📊 Demographics chart data:", demographicsChartData);
+        setDemographicsTimelineData(demographicsRes.buckets);
       }
 
     } catch (error) {
@@ -131,51 +166,12 @@ const Dashboard = () => {
     }
   };
 
-  // Setup Socket.IO listeners
-  // useEffect(() => {
-  //   socketService.connect();
 
-  //   // // Listen for alerts
-  //   // socketService.onAlert((data) => {
-  //   //   console.log(' Alert received:', data);
-  //   //   setAlert({
-  //   //     message: `${data.personName} ${data.direction} at ${data.zoneName}`,
-  //   //     severity: data.severity,
-  //   //     timestamp: new Date(data.ts),
-  //   //   });
-
-  //   //   // Auto-hide alert after 20 seconds
-  //   //   setTimeout(() => setAlert(null), 20000);
-  //   // });
-
-  //   // Listen for live occupancy updates
-  //   socketService.onLiveOccupancy((data) => {
-  //     console.log('Live occupancy update:', data);
-      
-  //     if (data.siteId !== selectedSite?.siteId) return;
-
-  //     setMetrics(prev => ({
-  //       ...prev,
-  //       occupancy: {
-  //         ...prev.occupancy,
-  //         value: data.siteOccupancy,
-  //       },
-  //     }));
-  //   });
-
-  //   return () => {
-  //     socketService.offAlert();
-  //     // socketService.offLiveOccupancy();
-  //   };
-  // }, [selectedSite]);
-
-  // Fetch data when site changes
   useEffect(() => {
     if (selectedSite?.siteId) {
-      console.log("🔄 Site changed, fetching data for:", selectedSite);
       fetchDashboardData();
     }
-  }, [selectedSite]);
+  }, [selectedSite, dateRange, customDates]);
 
   // Format dwell time
   const formatDwellTime = (minutes) => {
@@ -191,48 +187,91 @@ const Dashboard = () => {
       <div className="space-y-6">
         {/* Page Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-900">Dashboard Overview</h2>
-          <button
-            onClick={fetchDashboardData}
-            disabled={loading}
-            className="btn-secondary flex items-center space-x-2 disabled:opacity-50"
-          >
-            <svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            <span>Refresh</span>
-          </button>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-1">Overview</h2>
+            <p className="text-sm text-gray-500">Occupancy</p>
+          </div>
+          
+
+          <div className="flex items-center space-x-3">
+            <div className="relative">
+              <select
+                value={dateRange}
+                onChange={(e) => setDateRange(e.target.value)}
+                className="appearance-none bg-white border border-gray-300 rounded-lg pl-10 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              >
+                <option value="today">Today</option>
+                <option value="yesterday">Yesterday</option>
+                <option value="7days">Last 7 Days</option>
+                <option value="30days">Last 30 Days</option>
+                <option value="custom">Custom Range</option>
+              </select>
+              <svg 
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500"
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <svg 
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+
+            <button
+              onClick={fetchDashboardData}
+              disabled={loading}
+              className="btn-secondary flex items-center space-x-2 disabled:opacity-50"
+            >
+              <svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span>Refresh</span>
+            </button>
+          </div>
         </div>
 
-        {/* Alert Banner
-        {alert && (
-          <div className={`p-4 rounded-lg border ${
-            alert.severity === 'high'
-              ? 'bg-red-50 border-red-200 text-red-700'
-              : alert.severity === 'medium'
-              ? 'bg-yellow-50 border-yellow-200 text-yellow-700'
-              : 'bg-blue-50 border-blue-200 text-blue-700'
-          }`}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                </svg>
-                <span className="font-medium">{alert.message}</span>
+
+        {dateRange === 'custom' && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-center space-x-4">
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">From Date</label>
+                <input
+                  type="date"
+                  value={customDates.from}
+                  onChange={(e) => setCustomDates(prev => ({ ...prev, from: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                />
               </div>
-              <button
-                onClick={() => setAlert(null)}
-                className="ml-4 text-gray-500 hover:text-gray-700"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </button>
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">To Date</label>
+                <input
+                  type="date"
+                  value={customDates.to}
+                  onChange={(e) => setCustomDates(prev => ({ ...prev, to: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                />
+              </div>
+              <div className="pt-5">
+                <button
+                  onClick={fetchDashboardData}
+                  className="btn-primary"
+                >
+                  Apply
+                </button>
+              </div>
             </div>
           </div>
-        )} */}
+        )}
 
-        {/* Metric Cards */}
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <MetricCard
             title="Live Occupancy"
@@ -249,7 +288,7 @@ const Dashboard = () => {
             loading={loading}
           />
           <MetricCard
-            title="Average Dwell Time"
+            title="Avg Dwell Time"
             value={formatDwellTime(metrics.dwellTime.value)}
             change={metrics.dwellTime.change}
             icon="⏱️"
@@ -257,10 +296,34 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <div className="pt-4">
+          <h3 className="text-lg font-semibold text-gray-900">Overall Occupancy</h3>
+        </div>
+
+
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <OccupancyChart data={occupancyData} loading={loading} />
-          <DemographicsChart data={demographicsData} loading={loading} />
+        </div>
+
+
+        <div className="pt-4">
+          <h3 className="text-lg font-semibold text-gray-900">Demographics</h3>
+        </div>
+
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Pie Chart */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h4 className="text-base font-medium text-gray-900 mb-4">Chart of Demographics</h4>
+            <DemographicsChart data={demographicsData} loading={loading} />
+          </div>
+
+
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h4 className="text-base font-medium text-gray-900 mb-4">Demographics Analysis</h4>
+            <DemographicsTimelineChart data={demographicsTimelineData} loading={loading} />
+          </div>
         </div>
       </div>
     </Layout>
