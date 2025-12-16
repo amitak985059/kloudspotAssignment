@@ -1,4 +1,14 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend
+} from 'recharts';
+
 
 const DemographicsTimelineChart = ({ data, loading }) => {
   if (loading) {
@@ -49,56 +59,90 @@ const DemographicsTimelineChart = ({ data, loading }) => {
 
   return (
     <div className="w-full">
-      <ResponsiveContainer width="100%" height={300}>
-        <LineChart 
-          data={chartData}
-          margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-          <XAxis 
-            dataKey="time" 
-            stroke="#9ca3af"
-            style={{ fontSize: '12px' }}
-            tick={{ fill: '#6b7280' }}
-            axisLine={{ stroke: '#e5e7eb' }}
-            tickLine={{ stroke: '#e5e7eb' }}
-          />
-          <YAxis 
-            stroke="#9ca3af"
-            style={{ fontSize: '12px' }}
-            tick={{ fill: '#6b7280' }}
-            axisLine={{ stroke: '#e5e7eb' }}
-            tickLine={{ stroke: '#e5e7eb' }}
-            label={{ value: 'Count', angle: -90, position: 'insideLeft', style: { fontSize: '12px', fill: '#6b7280' } }}
-          />
-          <Tooltip content={<CustomTooltip />} />
-          <Legend 
-            verticalAlign="top" 
-            height={36}
-            iconType="line"
-            wrapperStyle={{ paddingBottom: '10px' }}
-          />
-          <Line 
-            type="monotone" 
-            dataKey="male" 
-            stroke="#60a5fa" 
-            strokeWidth={2.5}
-            dot={false}
-            activeDot={{ r: 5, fill: '#60a5fa', strokeWidth: 0 }}
-            name="Male"
-          />
-          <Line 
-            type="monotone" 
-            dataKey="female" 
-            stroke="#f472b6" 
-            strokeWidth={2.5}
-            dot={false}
-            activeDot={{ r: 5, fill: '#f472b6', strokeWidth: 0 }}
-            name="Female"
-          />
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
+  <ResponsiveContainer width="100%" height={320}>
+    <AreaChart
+      data={chartData}
+      margin={{ top: 20, right: 30, left: 10, bottom: 10 }}
+    >
+      <defs>
+        <linearGradient id="maleGradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#7FB2B1" stopOpacity={0.4} />
+          <stop offset="100%" stopColor="#7FB2B1" stopOpacity={0.05} />
+        </linearGradient>
+
+        <linearGradient id="femaleGradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#B5E0DF" stopOpacity={0.4} />
+          <stop offset="100%" stopColor="#B5E0DF" stopOpacity={0.05} />
+        </linearGradient>
+      </defs>
+
+      <CartesianGrid
+        stroke="#e5e7eb"
+        strokeDasharray="4 4"
+        vertical={false}
+      />
+
+      <XAxis
+        dataKey="time"
+        tick={{ fill: '#6b7280', fontSize: 12 }}
+        axisLine={{ stroke: '#e5e7eb' }}
+        tickLine={false}
+        label={{
+              value: "Time",
+              position: "insideBottom",
+              offset: -5,
+              fill: "#374151",
+              fontSize: 13
+            }}
+      />
+
+      <YAxis
+        tick={{ fill: '#6b7280', fontSize: 12 }}
+        axisLine={false}
+        tickLine={false}
+        label={{
+          value: 'Count',
+          angle: -90,
+          position: 'insideLeft',
+          fill: '#374151',
+          fontSize: 12
+        }}
+      />
+
+      <Tooltip content={<CustomTooltip />} />
+
+      <Legend
+        verticalAlign="top"
+        align="right"
+        iconType="circle"
+        wrapperStyle={{ fontSize: '14px' }}
+      />
+
+      <Area
+        type="monotone"
+        dataKey="male"
+        stroke="#7FB2B1"
+        strokeWidth={2.5}
+        fill="url(#maleGradient)"
+        name="Male"
+        dot={false}
+        activeDot={false}
+      />
+
+      <Area
+        type="monotone"
+        dataKey="female"
+        stroke="#B5E0DF"
+        strokeWidth={2.5}
+        fill="url(#femaleGradient)"
+        name="Female"
+        dot={false}
+        activeDot={false}
+      />
+    </AreaChart>
+  </ResponsiveContainer>
+</div>
+
   );
 };
 

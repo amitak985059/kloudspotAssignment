@@ -1,4 +1,4 @@
-const MetricCard = ({ title, value, change, icon, loading }) => {
+const MetricCard = ({ title, value, change, loading }) => {
   const isPositive = change >= 0;
 
   if (loading) {
@@ -42,19 +42,19 @@ const MetricCard = ({ title, value, change, icon, loading }) => {
                 )}
                 {Math.abs(change)}%
               </span>
-              <span className="text-sm text-gray-500 ml-2">vs yesterday</span>
+              <span className="text-sm text-gray-500 ml-2">More than yesterday</span>
             </div>
           )}
         </div>
         
 
-        {icon && (
+        {/* {icon && (
           <div className="flex-shrink-0 ml-4">
             <div className="w-14 h-14 bg-blue-50 rounded-lg flex items-center justify-center">
               <span className="text-3xl">{icon}</span>
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

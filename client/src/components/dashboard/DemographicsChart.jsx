@@ -1,8 +1,8 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
 
 const COLORS = {
-  Male: '#60a5fa',
-  Female: '#f472b6',
+  Male: '#7FB2B1',
+  Female: '#B5E0DF',
   male: '#60a5fa',
   female: '#f472b6',
 };
@@ -38,11 +38,11 @@ const DemographicsChart = ({ data, loading }) => {
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
     return (
-      <text 
-        x={x} 
-        y={y} 
-        fill="white" 
-        textAnchor={x > cx ? 'start' : 'end'} 
+      <text
+        x={x}
+        y={y}
+        fill="white"
+        textAnchor={x > cx ? 'start' : 'end'}
         dominantBaseline="central"
         className="text-sm font-semibold"
       >
@@ -55,31 +55,52 @@ const DemographicsChart = ({ data, loading }) => {
     <div className="w-full">
 
       <div className="flex justify-center mb-4">
-        <div style={{ width: '280px', height: '280px' }}>
+        <div style={{ width: '260px', height: '260px' }}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={pieData}
                 cx="50%"
                 cy="50%"
-                labelLine={false}
-                label={renderLabel}
-                outerRadius={120}
-                fill="#8884d8"
+                innerRadius={80}
+                outerRadius={110}
+                paddingAngle={6}
+                cornerRadius={12}
                 dataKey="value"
-                strokeWidth={0}
+                stroke="none"
               >
                 {pieData.map((entry, index) => (
-                  <Cell 
-                    key={`cell-${index}`} 
+                  <Cell
+                    key={`cell-${index}`}
                     fill={COLORS[entry.name]}
                   />
                 ))}
               </Pie>
+
+              {/* CENTER TEXT */}
+              <text
+                x="50%"
+                y="46%"
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className="fill-gray-500 text-sm"
+              >
+                Total Crowd
+              </text>
+              <text
+                x="50%"
+                y="55%"
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className="fill-gray-900 text-xl font-semibold"
+              >
+                100%
+              </text>
             </PieChart>
           </ResponsiveContainer>
         </div>
       </div>
+
 
 
       <div className="flex flex-col space-y-3 mt-4">
@@ -87,19 +108,15 @@ const DemographicsChart = ({ data, loading }) => {
           <div key={index} className="flex items-center justify-between px-4">
             <div className="flex items-center space-x-2">
 
-              <div 
+              <div
                 className="flex items-center justify-center w-8 h-8 rounded"
                 style={{ backgroundColor: COLORS[item.name] + '20' }}
               >
-                {item.name === 'Male' ? (
-                  <svg className="w-5 h-5" style={{ color: COLORS[item.name] }} fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 9c0-1.7 1.3-3 3-3s3 1.3 3 3c0 1.7-1.3 3-3 3s-3-1.3-3-3zm3 11c-2.8 0-8-1.4-8-4.2V15h16v.8c0 2.8-5.2 4.2-8 4.2z"/>
-                  </svg>
-                ) : (
-                  <svg className="w-5 h-5" style={{ color: COLORS[item.name] }} fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                  </svg>
-                )}
+                <img
+                  src={item.name === 'Male' ? '/male.svg' : '/female.svg'}
+                  alt={item.name}
+                  className="w-5 h-5"
+                />
               </div>
               <span className="text-sm font-medium text-gray-700">
                 {item.percentage}% {item.name}s

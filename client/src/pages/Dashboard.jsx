@@ -9,7 +9,7 @@ import { useSites } from "../context/SitesContext";
 
 const Dashboard = () => {
   const { selectedSite } = useSites();
-  
+
   const [dateRange, setDateRange] = useState('today');
   const [customDates, setCustomDates] = useState({ from: '', to: '' });
 
@@ -28,8 +28,8 @@ const Dashboard = () => {
     const now = Date.now();
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
-    switch(dateRange) {
+
+    switch (dateRange) {
       case 'today':
         return {
           fromUtc: today.getTime(),
@@ -88,7 +88,7 @@ const Dashboard = () => {
 
       console.log("📤 Dashboard API payload:", payload);
 
-      const [occupancyRes, footfallRes, dwellRes, demographicsRes] = 
+      const [occupancyRes, footfallRes, dwellRes, demographicsRes] =
         await Promise.all([
           analyticsAPI.getOccupancy(payload).catch(err => {
             console.error("Occupancy error:", err);
@@ -187,11 +187,11 @@ const Dashboard = () => {
       <div className="space-y-6">
         {/* Page Header */}
         <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">Overview</h2>
-            <p className="text-sm text-gray-500">Occupancy</p>
+          <div className=''>
+            <h2 className="text-2xl font-bold text-gray-900 mb-1 pb-5">Overview</h2>
+            <p className="text-2xl font-bold text-gray-900 mb-1">Occupancy</p>
           </div>
-          
+
 
           <div className="flex items-center space-x-3">
             <div className="relative">
@@ -206,18 +206,18 @@ const Dashboard = () => {
                 <option value="30days">Last 30 Days</option>
                 <option value="custom">Custom Range</option>
               </select>
-              <svg 
+              <svg
                 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500"
-                fill="none" 
-                stroke="currentColor" 
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <svg 
+              <svg
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-                fill="none" 
-                stroke="currentColor" 
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -277,21 +277,21 @@ const Dashboard = () => {
             title="Live Occupancy"
             value={metrics.occupancy.value}
             change={metrics.occupancy.change}
-            icon="👥"
+
             loading={loading}
           />
           <MetricCard
             title="Today's Footfall"
             value={metrics.footfall.value}
             change={metrics.footfall.change}
-            icon="🚶"
+
             loading={loading}
           />
           <MetricCard
             title="Avg Dwell Time"
             value={formatDwellTime(metrics.dwellTime.value)}
             change={metrics.dwellTime.change}
-            icon="⏱️"
+
             loading={loading}
           />
         </div>
@@ -302,7 +302,7 @@ const Dashboard = () => {
         </div>
 
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 relative">
           <OccupancyChart data={occupancyData} loading={loading} />
         </div>
 

@@ -1,6 +1,19 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+  ReferenceLine
+} from 'recharts';
 
-const OccupancyChart = ({ data, loading }) => {
+
+const OccupancyChart = ({ data, loading}) => {
+
+
   if (loading) {
     return (
       <div className="h-64 bg-gray-100 rounded animate-pulse"></div>
@@ -34,39 +47,88 @@ const OccupancyChart = ({ data, loading }) => {
   return (
     <div className="w-full">
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart 
+        <AreaChart
           data={data}
-          margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+          margin={{ top: 20, right: 40, left: 10, bottom: 10 }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-          <XAxis 
-            dataKey="time" 
-            stroke="#9ca3af"
-            style={{ fontSize: '12px' }}
-            tick={{ fill: '#6b7280' }}
-            axisLine={{ stroke: '#e5e7eb' }}
-            tickLine={{ stroke: '#e5e7eb' }}
+          <defs>
+            <linearGradient id="occupancyGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#7FB2B1" stopOpacity={0.4} />
+              <stop offset="100%" stopColor="#7FB2B1" stopOpacity={0.05} />
+            </linearGradient>
+          </defs>
+
+          <CartesianGrid
+            stroke="#e5e7eb"
+            strokeDasharray="4 4"
+            vertical={false}
           />
-          <YAxis 
-            stroke="#9ca3af"
-            style={{ fontSize: '12px' }}
-            tick={{ fill: '#6b7280' }}
+
+          <XAxis
+            dataKey="time"
+            tick={{ fill: '#6b7280', fontSize: 12 }}
             axisLine={{ stroke: '#e5e7eb' }}
-            tickLine={{ stroke: '#e5e7eb' }}
+            tickLine={false}
+            label={{
+              value: "Time",
+              position: "insideBottom",
+              offset: -5,
+              fill: "#374151",
+              fontSize: 13
+            }}
           />
+
+          <YAxis
+            tick={{ fill: '#6b7280', fontSize: 12 }}
+            axisLine={false}
+            tickLine={false}
+            label={{
+              value: "Count",
+              angle: -90,
+              position: "insideLeft",
+              fill: "#374151",
+              fontSize: 13
+            }}
+          />
+
           <Tooltip content={<CustomTooltip />} />
-          <Line 
-            type="monotone" 
-            dataKey="occupancy" 
-            stroke="#0ea5e9" 
-            strokeWidth={2.5}
-            dot={{ fill: '#0ea5e9', r: 3, strokeWidth: 0 }}
-            activeDot={{ r: 5, fill: '#0ea5e9', strokeWidth: 0 }}
-            name="Occupancy"
+
+          <Legend
+            verticalAlign="top"
+            align="right"
+            iconType="circle"
+            wrapperStyle={{ fontSize: '14px' }}
           />
-        </LineChart>
+
+          {/* LIVE vertical line */}
+          <ReferenceLine
+            x={data[data.length - 1]?.time}
+            stroke="#b91c1c"
+            strokeDasharray="4 4"
+            label={{
+              value: "LIVE",
+              position: "top",
+              fill: "#ffffff",
+              fontSize: 12,
+              background: "#b91c1c"
+            }}
+          />
+
+          <Area
+            type="monotone"
+            dataKey="occupancy"
+            stroke="#7FB2B1"
+            strokeWidth={2.5}
+            fill="url(#occupancyGradient)"
+            name="Occupancy"
+            dot={false}
+            activeDot={false}
+          />
+        </AreaChart>
       </ResponsiveContainer>
     </div>
+
+
   );
 };
 
