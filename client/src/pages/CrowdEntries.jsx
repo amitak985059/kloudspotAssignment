@@ -158,26 +158,17 @@ const CrowdEntries = () => {
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <svg 
+              {/* <svg 
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
+              </svg> */}
             </div>
 
-            <button
-              onClick={() => fetchEntries(pagination.currentPage)}
-              disabled={loading}
-              className="btn-secondary flex items-center space-x-2 disabled:opacity-50"
-            >
-              <svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              <span>Refresh</span>
-            </button>
+            
           </div>
         </div>
 
@@ -229,19 +220,7 @@ const CrowdEntries = () => {
             </div>
 
 
-            <div className="flex items-center space-x-2">
-              <label className="text-sm text-gray-600">Show:</label>
-              <select
-                value={pagination.limit}
-                onChange={handleLimitChange}
-                className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
-            </div>
+            
           </div>
         </div>
 
@@ -252,64 +231,77 @@ const CrowdEntries = () => {
 
 
         {pagination.totalPages > 1 && (
-          <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-            <div className="flex items-center justify-between">
-              <button
-                onClick={() => handlePageChange(pagination.currentPage - 1)}
-                disabled={pagination.currentPage === 1 || loading}
-                className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-              >
-                <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                Previous
-              </button>
+  <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+    <div className="flex items-center justify-center space-x-3">
 
-              <div className="flex items-center space-x-2">
-                {[...Array(pagination.totalPages)].map((_, i) => {
-                  const pageNum = i + 1;
-                  if (
-                    pageNum === 1 ||
-                    pageNum === pagination.totalPages ||
-                    (pageNum >= pagination.currentPage - 1 && pageNum <= pagination.currentPage + 1)
-                  ) {
-                    return (
-                      <button
-                        key={pageNum}
-                        onClick={() => handlePageChange(pageNum)}
-                        disabled={loading}
-                        className={`px-3 py-1 rounded-md text-sm disabled:opacity-50 ${
-                          pagination.currentPage === pageNum
-                            ? 'bg-primary-600 text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  } else if (
-                    pageNum === pagination.currentPage - 2 ||
-                    pageNum === pagination.currentPage + 2
-                  ) {
-                    return <span key={pageNum} className="text-gray-400">...</span>;
-                  }
-                  return null;
-                })}
-              </div>
+      {/* Previous */}
+      <button
+        onClick={() => handlePageChange(pagination.currentPage - 1)}
+        disabled={pagination.currentPage === 1 || loading}
+        className="text-gray-600 disabled:opacity-30"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
 
-              <button
-                onClick={() => handlePageChange(pagination.currentPage + 1)}
-                disabled={pagination.currentPage === pagination.totalPages || loading}
-                className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-              >
-                Next
-                <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        )}
+      {/* Page numbers */}
+      <div className="flex items-center space-x-4">
+        {[...Array(pagination.totalPages)].map((_, i) => {
+          const page = i + 1;
+
+          const isVisible =
+            page === 1 ||
+            page === pagination.totalPages ||
+            (page >= pagination.currentPage - 1 &&
+              page <= pagination.currentPage + 1);
+
+          if (!isVisible) {
+            if (
+              page === pagination.currentPage - 2 ||
+              page === pagination.currentPage + 2
+            ) {
+              return (
+                <span key={page} className="text-gray-400">
+                  …
+                </span>
+              );
+            }
+            return null;
+          }
+
+          return (
+            <button
+              key={page}
+              onClick={() => handlePageChange(page)}
+              disabled={loading}
+              className={`px-1 pb-1 text-sm font-medium transition
+                ${
+                  pagination.currentPage === page
+                    ? 'text-black border-b-2 border-[#009490]'
+                    : 'text-gray-600 hover:text-black'
+                }`}
+            >
+              {page}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Next */}
+      <button
+        onClick={() => handlePageChange(pagination.currentPage + 1)}
+        disabled={pagination.currentPage === pagination.totalPages || loading}
+        className="text-gray-600 disabled:opacity-30"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+    </div>
+  </div>
+)}
+
       </div>
     </Layout>
   );

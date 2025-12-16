@@ -57,10 +57,12 @@ const Layout = ({ children }) => {
     <div className="flex min-h-screen">
 
       <aside
-        className={`bg-[#0D3C3F] text-white flex flex-col justify-between  ${
-          isSidebarOpen ? "w-64" : "w-20"
-        } transition-all duration-300`}
-      >
+  className={`bg-[#0D3C3F] text-white flex flex-col justify-between
+    h-screen sticky top-0
+    ${isSidebarOpen ? "w-64" : "w-20"}
+    transition-all duration-300`}
+>
+
         <div>
 
           <div className="flex w-full p-4 items-center justify-between">

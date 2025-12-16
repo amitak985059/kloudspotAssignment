@@ -85,7 +85,7 @@ const EntriesTable = ({ data, loading }) => {
               Entry
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Exit 
+              Exit
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Dwell Time
@@ -108,32 +108,36 @@ const EntriesTable = ({ data, loading }) => {
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <span className={`px-2 inline-flex text-xs leading-5 font-semibold ${
-                  entry.gender?.toLowerCase() === 'male' 
-                    ? ''
-                    : entry.gender?.toLowerCase() === 'female'
-                    ? ''
-                    : ' '
-                }`}>
-                  {entry.gender || 'N/A'}
+                <span
+                  className={`px-2 inline-flex text-xs leading-5 font-semibold ${entry.gender?.toLowerCase() === "male"
+                      ? "text-Black-600"
+                      : entry.gender?.toLowerCase() === "female"
+                        ? "text-Black-600"
+                        : "text-Black-500"
+                    }`}
+                >
+                  {entry.gender
+                    ? entry.gender.charAt(0).toUpperCase() + entry.gender.slice(1)
+                    : "N/A"}
                 </span>
               </td>
+
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {formatTime(entry.entryLocal )}
+                {formatTime(entry.entryLocal)}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {entry.exitLocal  ? (
-                  formatTime(entry.exitLocal )
+                {entry.exitLocal ? (
+                  formatTime(entry.exitLocal)
                 ) : (
                   <span className="text-black-600 font-medium">--</span>
                 )}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {
-                    entry.exitLocal  ? formatDwellTime(entry.dwellMinutes) : (
-                      <span className='text-black-600 font-medium'>--</span>  
-                    )
-                  }
+                {
+                  entry.exitLocal ? formatDwellTime(entry.dwellMinutes) : (
+                    <span className='text-black-600 font-medium'>--</span>
+                  )
+                }
               </td>
               {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {
