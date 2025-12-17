@@ -100,19 +100,19 @@ const Dashboard = () => {
       const [occupancyRes, footfallRes, dwellRes, demographicsRes] =
         await Promise.all([
           analyticsAPI.getOccupancy(payload).catch(err => {
-            console.error("Occupancy error:", err);
+
             return null;
           }),
           analyticsAPI.getFootfall(payload).catch(err => {
-            console.error("Footfall error:", err);
+
             return null;
           }),
           analyticsAPI.getDwellTime(payload).catch(err => {
-            console.error("Dwell error:", err);
+
             return null;
           }),
           analyticsAPI.getDemographics(payload).catch(err => {
-            console.error("Demographics error:", err);
+
             return null;
           }),
         ]);
@@ -169,7 +169,7 @@ const Dashboard = () => {
       }
 
     } catch (error) {
-      console.error("Dashboard API error:", error);
+
     } finally {
       setLoading(false);
     }

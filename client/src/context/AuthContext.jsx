@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
       socketService.connect();
       return { success: true };
     } catch (error) {
-      console.error("Login error:", error);
+
       return {
         success: false,
         message: error.response?.status === 401

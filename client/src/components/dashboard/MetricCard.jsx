@@ -43,14 +43,6 @@ const MetricCard = ({ title, value, change, loading }) => {
           )}
         </div>
         
-
-        {/* {icon && (
-          <div className="flex-shrink-0 ml-4">
-            <div className="w-14 h-14 bg-blue-50 rounded-lg flex items-center justify-center">
-              <span className="text-3xl">{icon}</span>
-            </div>
-          </div>
-        )} */}
       </div>
     </div>
   );

@@ -84,10 +84,10 @@ const CrowdEntries = () => {
         pageNumber: page,
       };
 
-      console.log("Entry/Exit API payload:", payload);
+
 
       const data = await analyticsAPI.getEntryExit(payload);
-      console.log("Entry/Exit API response:", data);
+
 
       setEntries(data.records || []);
 
@@ -98,7 +98,7 @@ const CrowdEntries = () => {
         limit: pagination.limit,
       });
     } catch (error) {
-      console.error("Entry/Exit API Error:", error);
+
       setEntries([]);
     } finally {
       setLoading(false);
