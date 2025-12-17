@@ -77,7 +77,7 @@ const DemographicsChart = ({ data, loading }) => {
                 ))}
               </Pie>
 
-              {/* CENTER TEXT */}
+
               <text
                 x="50%"
                 y="46%"
@@ -122,16 +122,13 @@ const DemographicsChart = ({ data, loading }) => {
                 {item.percentage}% {item.name}s
               </span>
             </div>
-            <span className="text-sm font-semibold text-gray-900">{item.value}</span>
+
           </div>
         ))}
       </div>
 
 
-      {/* <div className="text-center mt-6 pt-4 border-t border-gray-200">
-        <p className="text-sm text-gray-500">Total Crowd</p>
-        <p className="text-2xl font-bold text-gray-900">{total}</p>
-      </div> */}
+      
     </div>
   );
 };

@@ -22,6 +22,16 @@ const Dashboard = () => {
   const [demographicsData, setDemographicsData] = useState([]);
   const [demographicsTimelineData, setDemographicsTimelineData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const getStartOfDayUTC = (date = new Date()) => {
+    const startOfDay = new Date(date); // Create a copy to avoid modifying the original date
+    startOfDay.setUTCHours(0, 0, 0, 0); // Set hours, minutes, seconds, and milliseconds to zero in UTC
+    return startOfDay;
+  };
+  const endOfDayUTC = (date = new Date()) => {
+    const startOfDay = new Date(date); // Create a copy to avoid modifying the original date
+    startOfDay.setUTCHours(23, 59, 59, 999); // Set hours, minutes, seconds, and milliseconds to zero in UTC
+    return startOfDay;
+  };
 
   // Get date range in milliseconds
   const getDateRange = () => {
@@ -32,8 +42,8 @@ const Dashboard = () => {
     switch (dateRange) {
       case 'today':
         return {
-          fromUtc: today.getTime(),
-          toUtc: now
+          fromUtc: getStartOfDayUTC().getTime(),
+          toUtc: endOfDayUTC().getTime()
         };
       case 'yesterday':
         const yesterday = new Date(today);
@@ -86,7 +96,7 @@ const Dashboard = () => {
         toUtc: toUtc,
       };
 
-      console.log("📤 Dashboard API payload:", payload);
+
 
       const [occupancyRes, footfallRes, dwellRes, demographicsRes] =
         await Promise.all([
@@ -223,7 +233,7 @@ const Dashboard = () => {
               </svg>
             </div>
 
-            
+
           </div>
         </div>
 

@@ -96,7 +96,7 @@ const EntriesTable = ({ data, loading }) => {
         <tbody className="bg-white divide-y divide-gray-200">
           {data.map((entry, index) => (
             <tr key={entry.id || index} className="hover:bg-gray-50">
-              {/* Name */}
+
               <td className="px-6 py-3 whitespace-nowrap">
                 <div className="flex items-center">
                   <div className="flex-shrink-0 h-9 w-9 bg-primary-100 rounded-full flex items-center justify-center">
@@ -112,24 +112,24 @@ const EntriesTable = ({ data, loading }) => {
                 </div>
               </td>
 
-              {/* Sex */}
+
               <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
                 {entry.gender
                   ? entry.gender.charAt(0).toUpperCase() + entry.gender.slice(1)
                   : 'N/A'}
               </td>
 
-              {/* Entry */}
+
               <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                 {formatTime(entry.entryLocal)}
               </td>
 
-              {/* Exit */}
+
               <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                 {entry.exitLocal ? formatTime(entry.exitLocal) : '--'}
               </td>
 
-              {/* Dwell */}
+
               <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                 {entry.exitLocal ? formatDwellTime(entry.dwellMinutes) : '--'}
               </td>
