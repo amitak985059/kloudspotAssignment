@@ -29,7 +29,7 @@ const DemographicsTimelineChart = ({ data, loading }) => {
   const chartData = data
     .filter(bucket => bucket.male > 0 || bucket.female > 0)
     .map(bucket => ({
-      time: bucket.local.split(' ')[1].substring(0, 5), // "04:00"
+      time: bucket.local.split(' ')[1].substring(0, 5) + " UTC", // "04:00"
       male: Math.round(bucket.male),
       female: Math.round(bucket.female),
     }));

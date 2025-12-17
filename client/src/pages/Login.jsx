@@ -84,7 +84,7 @@ const Login = () => {
                 value={formData.email}
                 onChange={handleChange}
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-[#0F6255]"
-                placeholder="Parking_solutions"
+                placeholder="User Name"
                 required
               />
             </div>

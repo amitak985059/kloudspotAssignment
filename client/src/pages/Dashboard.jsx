@@ -97,7 +97,6 @@ const Dashboard = () => {
       };
 
 
-
       const [occupancyRes, footfallRes, dwellRes, demographicsRes] =
         await Promise.all([
           analyticsAPI.getOccupancy(payload).catch(err => {
@@ -144,7 +143,7 @@ const Dashboard = () => {
 
       if (occupancyRes?.buckets) {
         const chartData = occupancyRes.buckets.map(bucket => ({
-          time: bucket.local.split(' ')[1].substring(0, 5),
+          time: bucket.local.split(' ')[1].substring(0, 5) + " UTC",
           timestamp: bucket.utc,
           occupancy: Math.round(bucket.avg),
         }));
@@ -312,15 +311,15 @@ const Dashboard = () => {
         </div>
 
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="flex w-full gap-6">
           {/* Pie Chart */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-white w-1/3 rounded-lg shadow-sm border border-gray-200 p-6">
             <h4 className="text-base font-medium text-gray-900 mb-4">Chart of Demographics</h4>
             <DemographicsChart data={demographicsData} loading={loading} />
           </div>
 
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-white w-full rounded-lg shadow-sm border border-gray-200 p-6">
             <h4 className="text-base font-medium text-gray-900 mb-4">Demographics Analysis</h4>
             <DemographicsTimelineChart data={demographicsTimelineData} loading={loading} />
           </div>

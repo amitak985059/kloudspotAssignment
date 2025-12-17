@@ -100,20 +100,7 @@ const OccupancyChart = ({ data, loading}) => {
             wrapperStyle={{ fontSize: '14px' }}
           />
 
-          {/* LIVE vertical line */}
-          <ReferenceLine
-            x={data[data.length - 1]?.time}
-            stroke="#b91c1c"
-            strokeDasharray="4 4"
-            label={{
-              value: "LIVE",
-              position: "top",
-              fill: "#ffffff",
-              fontSize: 12,
-              background: "#b91c1c"
-            }}
-          />
-
+          
           <Area
             type="monotone"
             dataKey="occupancy"
