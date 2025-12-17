@@ -8,7 +8,10 @@ const EntriesTable = ({ data, loading }) => {
           <thead className="bg-gray-50">
             <tr>
               {['Name', 'Gender', 'Entry Time', 'Exit Time', 'Dwell Time'].map((header) => (
-                <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  key={header}
+                  className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   {header}
                 </th>
               ))}
@@ -18,7 +21,7 @@ const EntriesTable = ({ data, loading }) => {
             {[...Array(5)].map((_, i) => (
               <tr key={i} className="animate-pulse">
                 {[...Array(5)].map((_, j) => (
-                  <td key={j} className="px-6 py-4">
+                  <td key={j} className="px-4 py-3">
                     <div className="h-4 bg-gray-200 rounded"></div>
                   </td>
                 ))}
@@ -45,10 +48,8 @@ const EntriesTable = ({ data, loading }) => {
   const formatTime = (timestamp) => {
     if (!timestamp) return '--';
     try {
-      // Handle both ISO string and DD/MM/YYYY HH:mm:ss format
       let date;
       if (timestamp.includes('/')) {
-        // Parse DD/MM/YYYY HH:mm:ss format
         const [datePart, timePart] = timestamp.split(' ');
         const [day, month, year] = datePart.split('/');
         date = new Date(`${year}-${month}-${day}T${timePart}`);
@@ -56,14 +57,13 @@ const EntriesTable = ({ data, loading }) => {
         date = new Date(timestamp);
       }
       return format(date, 'hh:mm a');
-    } catch (error) {
-      console.error('Error formatting time:', error, timestamp);
+    } catch {
       return timestamp;
     }
   };
 
   const formatDwellTime = (minutes) => {
-    if (!minutes && minutes !== 0) return '-';
+    if (!minutes && minutes !== 0) return '--';
     if (minutes < 60) return `${Math.round(minutes)}m`;
     const hours = Math.floor(minutes / 60);
     const mins = Math.round(minutes % 60);
@@ -71,81 +71,68 @@ const EntriesTable = ({ data, loading }) => {
   };
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto max-w-full">
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-[#E8E8E8]">
           <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Name
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Sex
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Entry
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Exit
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Dwell Time
             </th>
           </tr>
         </thead>
+
         <tbody className="bg-white divide-y divide-gray-200">
           {data.map((entry, index) => (
             <tr key={entry.id || index} className="hover:bg-gray-50">
-              <td className="px-6 py-4 whitespace-nowrap">
+              {/* Name */}
+              <td className="px-6 py-3 whitespace-nowrap">
                 <div className="flex items-center">
-                  <div className="flex-shrink-0 h-10 w-10 bg-primary-100 rounded-full flex items-center justify-center">
+                  <div className="flex-shrink-0 h-9 w-9 bg-primary-100 rounded-full flex items-center justify-center">
                     <span className="text-primary-600 font-medium">
                       {entry.name?.charAt(0)?.toUpperCase() || '?'}
                     </span>
                   </div>
-                  <div className="ml-4">
-                    <div className="text-sm font-medium text-gray-900">{entry.personName || 'Unknown'}</div>
+                  <div className="ml-3">
+                    <div className="text-sm font-medium text-gray-900">
+                      {entry.personName || 'Unknown'}
+                    </div>
                   </div>
                 </div>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <span
-                  className={`px-2 inline-flex text-xs leading-5 font-semibold ${entry.gender?.toLowerCase() === "male"
-                      ? "text-Black-600"
-                      : entry.gender?.toLowerCase() === "female"
-                        ? "text-Black-600"
-                        : "text-Black-500"
-                    }`}
-                >
-                  {entry.gender
-                    ? entry.gender.charAt(0).toUpperCase() + entry.gender.slice(1)
-                    : "N/A"}
-                </span>
+
+              {/* Sex */}
+              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                {entry.gender
+                  ? entry.gender.charAt(0).toUpperCase() + entry.gender.slice(1)
+                  : 'N/A'}
               </td>
 
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {/* Entry */}
+              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                 {formatTime(entry.entryLocal)}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {entry.exitLocal ? (
-                  formatTime(entry.exitLocal)
-                ) : (
-                  <span className="text-black-600 font-medium">--</span>
-                )}
+
+              {/* Exit */}
+              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                {entry.exitLocal ? formatTime(entry.exitLocal) : '--'}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {
-                  entry.exitLocal ? formatDwellTime(entry.dwellMinutes) : (
-                    <span className='text-black-600 font-medium'>--</span>
-                  )
-                }
+
+              {/* Dwell */}
+              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                {entry.exitLocal ? formatDwellTime(entry.dwellMinutes) : '--'}
               </td>
-              {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {
-                    entry.exitLocal  ? formatDwellTime(entry.dwellMinutes) : (
-                      <span className='text-black-600 font-medium'>--</span>  
-                    )
-                  }
-              </td> */}
             </tr>
           ))}
         </tbody>

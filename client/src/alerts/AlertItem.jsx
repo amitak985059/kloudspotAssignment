@@ -1,7 +1,7 @@
 const severityColors = {
-  high: "bg-red-100 text-red-700",
-  medium: "bg-yellow-100 text-yellow-700",
-  low: "bg-green-100 text-green-700",
+  high: "bg-[#B42019] text-white",
+  medium: "bg-[#FF9902] text-white",
+  low: "bg-[#00AB7B] text-white",
 };
 
 const AlertItem = ({ alert }) => {
@@ -31,19 +31,19 @@ const AlertItem = ({ alert }) => {
       </div>
 
       <div className="text-sm text-gray-600 flex items-center gap-1 mt-1">
-        📍 {alert.zoneName}
+        <img className="w-[18px]" src="/alertLocationLogo.svg" alt="" />{alert.zoneName}
       </div>
 
-    <div className="mt-2 flex justify-end">
-  <span
-    className={`px-3 py-1.5 min-w-[72px] text-center rounded-md text-xs font-semibold ${
-      severityColors[alert.severity] || "bg-gray-100"
-    }`}
-  >
-    {alert.severity}
-  </span>
-</div>
-
+      <div className="mt-2 flex justify-end">
+        <div className="">
+          <span
+            className={`px-4 py-2 min-w-[72px] text-center rounded-sm text-xs font-semibold 
+  ${severityColors[alert.severity] || "bg-gray-100"}`}
+          >
+            {alert.severity.charAt(0).toUpperCase() + alert.severity.slice(1)}
+          </span>
+        </div>
+      </div>
     </div>
   );
 };
