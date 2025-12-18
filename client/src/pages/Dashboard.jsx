@@ -43,7 +43,7 @@ const Dashboard = () => {
       case 'today':
         return {
           fromUtc: getStartOfDayUTC().getTime(),
-          toUtc: endOfDayUTC().getTime()
+          toUtc: now
         };
       case 'yesterday':
         const yesterday = new Date(today);
